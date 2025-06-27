@@ -18,7 +18,6 @@ public class MySqlProfileDao extends MySqlDaoBase implements ProfileDao {
 
     @Override
     public Profile create(Profile profile) {
-        // This method should already exist from your registration logic
         String sql = "INSERT INTO profiles (user_id, first_name, last_name, phone, email, address, city, state, zip) " +
                 " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
 
@@ -41,7 +40,6 @@ public class MySqlProfileDao extends MySqlDaoBase implements ProfileDao {
         }
     }
 
-    // FIX #1: Implement this method to fetch the profile
     @Override
     public Profile getByUserId(int userId) {
         String sql = "SELECT * FROM profiles WHERE user_id = ?;";
@@ -57,8 +55,39 @@ public class MySqlProfileDao extends MySqlDaoBase implements ProfileDao {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        // Return null if no profile is found
         return null;
+    }
+
+    // --- THIS IS THE UPDATED/NEW METHOD ---
+    @Override
+    public void update(int userId, Profile profile) {
+        String sql = "UPDATE profiles SET " +
+                " first_name = ?, " +
+                " last_name = ?, " +
+                " phone = ?, " +
+                " email = ?, " +
+                " address = ?, " +
+                " city = ?, " +
+                " state = ?, " +
+                " zip = ? " +
+                "WHERE user_id = ?;";
+
+        try (Connection connection = getConnection()) {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, profile.getFirstName());
+            statement.setString(2, profile.getLastName());
+            statement.setString(3, profile.getPhone());
+            statement.setString(4, profile.getEmail());
+            statement.setString(5, profile.getAddress());
+            statement.setString(6, profile.getCity());
+            statement.setString(7, profile.getState());
+            statement.setString(8, profile.getZip());
+            statement.setInt(9, userId);
+
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private Profile mapRow(ResultSet row) throws SQLException {
